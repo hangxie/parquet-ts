@@ -1,0 +1,86 @@
+name: Build Action
+
+on:
+  workflow_call:
+
+jobs:
+  check-node-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check engines.node is not newer than the oldest supported LTS
+        run: |
+          SCHEDULE=$(curl -sSfL https://raw.githubusercontent.com/nodejs/Release/main/schedule.json)
+          TODAY=$(date -u +%Y-%m-%d)
+
+          # Oldest release line that reached LTS and has not hit end-of-life yet.
+          OLDEST_LTS=$(echo "$SCHEDULE" | jq -r --arg today "$TODAY" '
+            to_entries
+            | map(select(.value.lts != null and .value.end > $today))
+            | map(.key | ltrimstr("v") | tonumber)
+            | min // empty')
+
+          if [ -z "$OLDEST_LTS" ]; then
+            echo "::error::Could not determine the oldest supported Node.js LTS"
+            exit 1
+          fi
+
+          ENGINES=$(jq -r '.engines.node' package.json)
+          ENGINES_MIN=$(echo "$ENGINES" | grep -oE '[0-9]+' | head -1)
+
+          echo "Oldest supported LTS: ${OLDEST_LTS}, package.json engines.node: ${ENGINES} (min ${ENGINES_MIN})"
+
+          if [ "$ENGINES_MIN" -gt "$OLDEST_LTS" ]; then
+            echo "::error::package.json requires Node ${ENGINES_MIN} but policy requires <= ${OLDEST_LTS} (oldest supported LTS)"
+            exit 1
+          fi
+
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        node-version: ["22", "24", "26"]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Installing Dependencies
+        run: make deps
+      - name: Running format
+        run: make format
+      - name: Running lint
+        run: make lint
+      - name: Running tests
+        run: make test
+      - name: Ensure the package can be built
+        run: make build
+      - name: Checking uncommitted changes
+        run: |
+          git status -s > /tmp/git-status.log
+          if [ -s /tmp/git-status.log ] ; then
+            echo There are uncommitted changes
+            cat /tmp/git-status.log
+            false
+          fi
+
+  build-complete:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    needs: [check-node-version, build]
+    if: always()
+    steps:
+      - name: Check job results
+        run: |
+          if [ "${{ needs.check-node-version.result }}" != "success" ] || [ "${{ needs.build.result }}" != "success" ]; then
+            echo "::error::One or more jobs failed"
+            exit 1
+          fi
