@@ -1,0 +1,10 @@
+name: Pull Request Build
+permissions:
+  contents: read
+
+on:
+  pull_request:
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
