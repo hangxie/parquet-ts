@@ -1,0 +1,11 @@
+build/
+dist/
+node_modules/
+
+.idea
+.vscode
+*.swp
+.claude
+*.tsbuildinfo
+npm-debug.log*
+.DS_Store

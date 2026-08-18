@@ -1,0 +1,56 @@
+{
+  "name": "parquet-ts",
+  "version": "0.0.0",
+  "description": "A TypeScript-native implementation of the Apache Parquet file format",
+  "license": "BSD-3-Clause",
+  "author": "Hang Xie",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hangxie/parquet-ts.git"
+  },
+  "homepage": "https://github.com/hangxie/parquet-ts#readme",
+  "bugs": {
+    "url": "https://github.com/hangxie/parquet-ts/issues"
+  },
+  "keywords": [
+    "parquet",
+    "apache-parquet",
+    "columnar",
+    "typescript"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "src",
+    "!**/*.test.ts"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "clean": "rm -rf dist build",
+    "prepack": "npm run build",
+    "format": "biome format --write .",
+    "lint": "biome check . && tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.7",
+    "@types/node": "^22.20.1",
+    "@vitest/coverage-v8": "^4.1.10",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
+  }
+}

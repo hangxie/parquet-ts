@@ -1,0 +1,23 @@
+repos:
+  - repo: "https://github.com/pre-commit/pre-commit-hooks"
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+        exclude: ^tests/fixtures/
+      - id: fix-byte-order-marker
+      - id: check-executables-have-shebangs
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-xml
+      - id: check-yaml
+      - id: detect-aws-credentials
+        args: [--allow-missing-credentials]
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: no-commit-to-branch
+      - id: pretty-format-json
+        args: [--no-sort-keys]
+        exclude: ^(package-lock\.json|tsconfig.*\.json)$
+      - id: trailing-whitespace
