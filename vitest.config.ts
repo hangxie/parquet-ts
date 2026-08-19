@@ -2,7 +2,10 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
-    include: ['src/**/*.test.ts', 'tests/**/*.test.ts'],
+    // Unit tests only. Interoperability suites under tests/ need the pinned
+    // fixtures from `make testdata` and get their own runner when they land,
+    // so they must not be picked up by the plain unit run.
+    include: ['src/**/*.test.ts'],
     environment: 'node',
     coverage: {
       provider: 'v8',

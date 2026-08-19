@@ -17,7 +17,6 @@ repos:
       - id: end-of-file-fixer
       - id: mixed-line-ending
       - id: no-commit-to-branch
-      - id: pretty-format-json
-        args: [--no-sort-keys]
-        exclude: ^(package-lock\.json|tsconfig.*\.json)$
+      # pretty-format-json is deliberately absent: Biome formats JSON, and the
+      # two disagree on array wrapping, so each would undo the other.
       - id: trailing-whitespace

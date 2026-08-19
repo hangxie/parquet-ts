@@ -42,6 +42,14 @@ jobs:
           cache-dependency-path: package-lock.json
       - name: Running quality gates
         run: make all
+      - name: Checking uncommitted changes
+        run: |
+          git status -s > /tmp/git-status.log
+          if [ -s /tmp/git-status.log ] ; then
+            echo There are uncommitted changes
+            cat /tmp/git-status.log
+            false
+          fi
       - name: Publish to npm
         run: npm publish --provenance --access public
 

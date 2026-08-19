@@ -40,7 +40,7 @@
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "clean": "rm -rf dist build",
     "prepack": "npm run build",
-    "format": "biome format --write .",
+    "format": "biome check --write .",
     "lint": "biome check . && tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
