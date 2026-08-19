@@ -37,6 +37,20 @@ jobs:
             exit 1
           fi
 
+          # Upper bound alone would let engines.node keep claiming support for a
+          # release line that is out of support and untested by the matrix.
+          ENGINES_EOL=$(echo "$SCHEDULE" | jq -r --arg v "v${ENGINES_MIN}" '.[$v].end // empty')
+
+          if [ -z "$ENGINES_EOL" ]; then
+            echo "::error::Node ${ENGINES_MIN} is not a known release line"
+            exit 1
+          fi
+
+          if [[ "$ENGINES_EOL" < "$TODAY" ]]; then
+            echo "::error::package.json allows Node ${ENGINES_MIN}, which reached end-of-life on ${ENGINES_EOL}"
+            exit 1
+          fi
+
   build:
     runs-on: ubuntu-latest
     permissions:

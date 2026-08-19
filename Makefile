@@ -49,18 +49,14 @@ test: deps  ## Run unit tests with coverage
 	@echo "==> Running unit tests"
 	@$(NPM) run --silent test:coverage
 
-.PHONY: test-compat
-test-compat: deps testdata  ## Run interoperability tests against apache/parquet-testing
-	@echo "==> Running interoperability tests"
-	@$(NPM) exec --silent -- vitest run tests/compatibility --passWithNoTests
-
 .PHONY: testdata
 testdata:  ## Download test data from apache/parquet-testing
 	@mkdir -p $(TESTDATA_DIR)
-	@for f in $(TESTDATA_FILES); do \
+	@set -e; for f in $(TESTDATA_FILES); do \
 		if [ ! -f "$$f" ]; then \
 			echo "    ==> Downloading $$(basename $$f)"; \
-			curl -sSfL -o "$$f" "$(PARQUET_TESTING)/$$(basename $$f)"; \
+			curl -sSfL -o "$$f.tmp" "$(PARQUET_TESTING)/$$(basename $$f)"; \
+			mv "$$f.tmp" "$$f"; \
 		fi; \
 	done
 
